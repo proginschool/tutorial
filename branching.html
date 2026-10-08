@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтерактивний урок: Розгалуження в Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Smooth transitions for locking/unlocking */
+        .section-block, .task-block { transition: all 0.5s ease; }
+        .locked { opacity: 0.4; pointer-events: none; filter: grayscale(80%); user-select: none; }
+        
+        /* Custom lightweight code editor */
+        .editor-container { position: relative; border-radius: 0.5rem; overflow: hidden; background-color: #1e1e1e; border: 2px solid #374151; }
+        .editor-container:focus-within { border-color: #3b82f6; }
+        .code-highlight, .code-input { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            padding: 1rem; margin: 0; border: none; font-size: 0.9rem; line-height: 1.5; 
+            white-space: pre; overflow-y: auto; overflow-x: auto;
+        }
+        .code-input { color: transparent; background: transparent; caret-color: white; z-index: 10; resize: none; outline: none; }
+        .code-highlight { color: #d4d4d4; z-index: 5; pointer-events: none; }
+        
+        /* Syntax highlighting colors */
+        .hl-keyword { color: #c586c0; font-weight: bold; } /* if, else, elif */
+        .hl-function { color: #dcdcaa; } /* print, input, int */
+        .hl-string { color: #ce9178; } /* "text" */
+        .hl-number { color: #b5cea8; } /* 123 */
+        .hl-comment { color: #6a9955; font-style: italic; } /* # comment */
+        
+        /* Запобігаємо перефарбовуванню слів всередині рядків та коментарів */
+        .hl-string span, .hl-comment span { color: inherit !important; font-weight: inherit !important; font-style: inherit !important; }
+
+        /* Success animation */
+        @keyframes bounce-success {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .success-anim { animation: bounce-success 0.5s ease; color: #10b981; font-weight: bold; }
+
+        /* Loader */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Sticky Header / Progress Bar -->
+    <header class="sticky top-0 z-50 bg-white shadow-md w-full px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-4 w-2/3">
+            <span class="font-bold text-lg hidden sm:block">Прогрес:</span>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div id="progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="font-bold text-xl text-blue-700 bg-blue-100 px-4 py-1 rounded-lg shadow-inner">
+            Бали: <span id="score-counter">0</span>/100
+        </div>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-40 flex flex-col items-center justify-center">
+        <div class="loader mb-4"></div>
+        <h2 class="text-2xl font-bold text-gray-800 text-center px-4">Завантаження середовища Python...<br><span class="text-sm font-normal text-gray-500">Це може зайняти кілька секунд при першому запуску</span></h2>
+    </div>
+
+    <main class="max-w-4xl mx-auto mt-8 px-4 space-y-12">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Розгалуження в Python 🐍</h1>
+            <p class="text-lg text-gray-600">Навчимо програму приймати рішення, як справжня людина!</p>
+        </div>
+
+        <!-- ================= BLOCK 1: if ================= -->
+        <section id="block-1" class="section-block bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span> 
+                Знайомство з `if` (Якщо)
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- Theory -->
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <h3 class="font-bold text-blue-800 mb-2">🧠 Теорія: Життєва аналогія</h3>
+                    <p class="mb-2">У житті ми постійно ставимо умови: <strong>"ЯКЩО йде дощ ➔ беремо парасольку"</strong>. У Python для цього є команда <code>if</code> (з англ. "якщо").</p>
+                    <p>Правило запису:</p>
+                    <ul class="list-disc pl-5 mb-2 font-mono text-sm bg-white p-3 rounded shadow-inner">
+                        <li><span class="text-purple-600 font-bold">if</span> умова<span class="text-red-500 font-bold text-lg">:</span> <span class="text-gray-500 italic"># Двокрапка обов'язкова!</span></li>
+                        <li>&nbsp;&nbsp;&nbsp;&nbsp;команда <span class="text-gray-500 italic"># Відступ (4 пробіли) показує, що команда всередині if</span></li>
+                    </ul>
+                </div>
+
+                <!-- Interactive 1 -->
+                <div id="b1-inter" class="task-block bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold mb-2">🔍 Дослідник</h3>
+                    <p class="text-sm mb-3">Змінюй значення температури. Натисни "Виконати". Подивись, коли програма виводить текст, а коли мовчить.</p>
+                    <div class="flex gap-4 items-start flex-col sm:flex-row">
+                        <div class="font-mono bg-[#1e1e1e] text-[#d4d4d4] p-3 rounded-lg w-full sm:w-1/2 text-sm">
+                            <span class="hl-function">temp</span> = <input type="number" id="b1-input" value="-5" class="w-16 bg-gray-700 text-white text-center rounded border border-gray-600 outline-none"> <br>
+                            <span class="hl-keyword">if</span> temp < 0:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Холодно, одягай шапку!"</span>)
+                        </div>
+                        <div class="flex flex-col gap-2 w-full sm:w-1/2">
+                            <button onclick="runBlock1Interactive()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">▶ Виконати</button>
+                            <div id="b1-out" class="bg-black text-green-400 font-mono p-2 rounded h-12 flex items-center shadow-inner text-sm px-2 overflow-hidden whitespace-nowrap text-ellipsis"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz 1 -->
+                <div id="b1-quiz" class="task-block locked bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-2">📝 Експрес-тест</h3>
+                    
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">1. Де обов'язково ставиться двокрапка <code>:</code> ?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q1_1" value="wrong"> Де завгодно, аби була</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q1_1" value="correct"> В кінці рядка з умовою <code>if</code></label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q1_1" value="wrong"> Перед ключовим словом <code>if</code></label>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">2. Навіщо потрібен відступ (4 пробіли) перед командою?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q1_2" value="wrong"> Виключно для краси коду</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q1_2" value="correct"> Щоб Python зрозумів, що ця команда виконується ТІЛЬКИ якщо умова правдива</label>
+                    </div>
+
+                    <button onclick="checkQuiz1()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded transition">Відповісти</button>
+                    <div id="b1-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 1.1 -->
+                <div id="b1-prac1" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 1: "Позитивне мислення"</h3>
+                    <p class="text-sm mb-2">Напиши програму за 3 кроки:</p>
+                    <ol class="list-decimal pl-5 text-sm mb-4">
+                        <li>Створи змінну <code>num = int(input())</code></li>
+                        <li>Напиши умову: якщо <code>num</code> більше нуля (<code>&gt; 0</code>)...</li>
+                        <li>Зроби відступ і виведи слово <code>"Додатно"</code> за допомогою <code>print()</code>.</li>
+                    </ol>
+                    
+                    <div class="editor-container mb-3" style="height: 100px;">
+                        <div id="b1-editor1-hl" class="code-highlight"></div>
+                        <textarea id="b1-editor1" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice1_1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b1-prac1-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 1.2 -->
+                <div id="b1-prac2" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 2: "Секретне слово"</h3>
+                    <p class="text-sm mb-2">Слова теж можна перевіряти! Увага: текст зчитуємо просто як <code>input()</code> (без `int`), а при порівнянні використовуємо подвійне дорівнює <code>==</code>.</p>
+                    <p class="text-sm mb-4">Зчитай змінну <code>word = input()</code>. Якщо слово дорівнює <code>"Python"</code> (в лапках з великої літери), виведи <code>"Таємницю розкрито"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 100px;">
+                        <div id="b1-editor2-hl" class="code-highlight"></div>
+                        <textarea id="b1-editor2" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice1_2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b1-prac2-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BLOCK 2: else ================= -->
+        <section id="block-2" class="section-block locked bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span> 
+                Альтернатива `else` (Інакше)
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <h3 class="font-bold text-purple-800 mb-2">🧠 Теорія: Що, якщо ні?</h3>
+                    <p class="mb-2">Аналогія: <strong>"ЯКЩО є гроші ➔ купуємо снек, ІНАКШЕ ➔ йдемо додому"</strong>. Слово <code>else</code> обробляє всі інші випадки, коли умова <code>if</code> виявилася брехнею.</p>
+                    <p class="font-bold text-red-600 text-sm">Важливо: else пишеться з нового рядка, БЕЗ відступу (на одному рівні з if), і теж має двокрапку в кінці!</p>
+                </div>
+
+                <!-- Interactive 2 -->
+                <div id="b2-inter" class="task-block bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold mb-2">🐞 Знайди помилку</h3>
+                    <p class="text-sm mb-3">Хтось написав код, але забув про відступ для команди всередині <code>else</code>. Виправ код у редакторі (додай 4 пробіли перед другим print) і натисни перевірити.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 120px;">
+                        <div id="b2-fix-hl" class="code-highlight"></div>
+                        <textarea id="b2-fix" class="code-input" spellcheck="false">
+age = int(input())
+if age >= 18:
+    print("Дорослий")
+else:
+print("Дитина")</textarea>
+                    </div>
+                    <button onclick="checkFix2()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">Перевірити виправлення</button>
+                    <div id="b2-fix-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Quiz 2 -->
+                <div id="b2-quiz" class="task-block locked bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-2">📝 Експрес-тест</h3>
+                    
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">1. Чи можна написати свою умову поруч із `else` (наприклад: <code>else вік < 18:</code>)?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q2_1" value="wrong"> Так, це обов'язково</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q2_1" value="correct"> Ні, else автоматично ловить всі варіанти, що не підійшли під if</label>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">2. З яким відступом пишеться саме слово <code>else:</code> ?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q2_2" value="wrong"> З відступом у 4 пробіли</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q2_2" value="correct"> Без відступу (на тій же вертикальній лінії, що й if)</label>
+                    </div>
+
+                    <button onclick="checkQuiz2()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded transition">Відповісти</button>
+                    <div id="b2-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 2.1 -->
+                <div id="b2-prac1" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 1: "Перепустка"</h3>
+                    <p class="text-sm mb-4">Програма отримує вік: <code>vik = int(input())</code>. Якщо вік 18 або більше (<code>&gt;= 18</code>), виведи <code>"Вхід дозволено"</code>, інакше виведи <code>"Вхід заборонено"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 140px;">
+                        <div id="b2-editor1-hl" class="code-highlight"></div>
+                        <textarea id="b2-editor1" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice2_1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b2-prac1-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 2.2 -->
+                <div id="b2-prac2" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 2: "Парне чи Непарне?"</h3>
+                    <p class="text-sm mb-2">Щоб перевірити, чи ділиться число на 2 без остачі (тобто чи є воно парним), у Python використовують оператор <code>%</code> (остача від ділення).</p>
+                    <p class="font-mono text-sm bg-white p-2 mb-4 rounded inline-block">Умова: <code>if num % 2 == 0:</code></p>
+                    <p class="text-sm mb-4">Зчитай число <code>num</code>. Якщо воно парне — виведи <code>"Парне"</code>, інакше виведи <code>"Непарне"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 140px;">
+                        <div id="b2-editor2-hl" class="code-highlight"></div>
+                        <textarea id="b2-editor2" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice2_2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b2-prac2-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BLOCK 3: elif ================= -->
+        <section id="block-3" class="section-block locked bg-white p-6 rounded-2xl shadow-lg border-t-4 border-orange-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span> 
+                Багато варіантів `elif`
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                    <h3 class="font-bold text-orange-800 mb-2">🧠 Теорія: Якщо, А якщо, Інакше</h3>
+                    <p class="mb-2">Коли варіантів більше ніж два (наприклад, оцінки чи кольори світлофора), використовують <code>elif</code> (скорочення від else if - "інакше якщо"). Їх може бути скільки завгодно!</p>
+                    <p class="text-sm">Також можна об'єднувати умови: <br><code>and</code> (і) - вимагає, щоб <b>обидві</b> умови були правдою.<br><code>or</code> (або) - достатньо, щоб <b>хоча б одна</b> умова була правдою.</p>
+                </div>
+
+                <!-- Interactive 3: Trace -->
+                <div id="b3-inter" class="task-block bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold mb-2">🕵️ Трасування (читання коду)</h3>
+                    <div class="font-mono bg-[#1e1e1e] text-[#d4d4d4] p-3 rounded-lg text-sm mb-3">
+                        <span class="hl-function">m</span> = <span class="hl-number">10</span><br>
+                        <span class="hl-keyword">if</span> m == <span class="hl-number">1</span> <span class="hl-keyword">or</span> m == <span class="hl-number">2</span> <span class="hl-keyword">or</span> m == <span class="hl-number">12</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Зима"</span>)<br>
+                        <span class="hl-keyword">elif</span> m &gt;= <span class="hl-number">3</span> <span class="hl-keyword">and</span> m &lt;= <span class="hl-number">5</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Весна"</span>)<br>
+                        <span class="hl-keyword">elif</span> m &gt;= <span class="hl-number">6</span> <span class="hl-keyword">and</span> m &lt;= <span class="hl-number">8</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Літо"</span>)<br>
+                        <span class="hl-keyword">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Осінь"</span>)
+                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Що надрукує цей код, враховуючи, що m = 10?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="b3-quiz-input" placeholder="Введіть слово..." class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <button onclick="checkQuiz3_Trace()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">Відповісти</button>
+                    </div>
+                    <div id="b3-trace-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Quiz 3 -->
+                <div id="b3-quiz" class="task-block locked bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-2">📝 Експрес-тест</h3>
+                    
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">1. Для чого потрібна команда <code>elif</code>?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q3_1" value="wrong"> Це просто помилка в слові else</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q3_1" value="correct"> Для перевірки додаткової умови, якщо перша (if) виявилася хибною</label>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">2. Якщо ми пишемо <code>умова1 and умова2</code>, коли виконається код?</p>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q3_2" value="wrong"> Коли хоча б одна з умов правдива</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded cursor-pointer"><input type="radio" name="q3_2" value="correct"> Тільки тоді, коли ОБИДВІ умови одночасно правдиві</label>
+                    </div>
+
+                    <button onclick="checkQuiz3()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded transition">Відповісти</button>
+                    <div id="b3-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 3.1 -->
+                <div id="b3-prac1" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 1: "Оцінка"</h3>
+                    <p class="text-sm mb-4">Зчитай бал: <code>bal = int(input())</code>. <br>Якщо бал &gt;= 10 — виведи <code>"Високий"</code>.<br>Якщо бал &gt;= 7 <b>і (and)</b> бал &lt; 10 — виведи <code>"Достатній"</code>.<br>Інакше — виведи <code>"Треба попрацювати"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 180px;">
+                        <div id="b3-editor1-hl" class="code-highlight"></div>
+                        <textarea id="b3-editor1" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice3_1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b3-prac1-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 3.2 -->
+                <div id="b3-prac2" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 2: "Світлофор"</h3>
+                    <p class="text-sm mb-4">Зчитай колір: <code>color = input()</code> (просто текст).<br>Якщо <code>color == "червоний"</code> ➔ виведи <code>"Стій"</code>.<br>А якщо (<code>elif</code>) <code>color == "жовтий"</code> ➔ виведи <code>"Увага"</code>.<br>А якщо (<code>elif</code>) <code>color == "зелений"</code> ➔ виведи <code>"Йди"</code>.<br>Інакше ➔ виведи <code>"Зламався"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 220px;">
+                        <div id="b3-editor2-hl" class="code-highlight"></div>
+                        <textarea id="b3-editor2" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice3_2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b3-prac2-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BLOCK 4: Nested / Ternary ================= -->
+        <section id="block-4" class="section-block locked bg-white p-6 rounded-2xl shadow-lg border-t-4 border-red-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span> 
+                Продвинутий рівень
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- Theory -->
+                <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                    <h3 class="font-bold text-red-800 mb-2">🧠 Теорія: Вкладені розгалуження (`if` всередині `if`)</h3>
+                    <p class="mb-2">Іноді нам потрібно перевірити умову <b>тільки після того</b>, як інша умова вже виявилася правдою. Це наче фейс-контроль на закриту вечірку:</p>
+                    <ul class="list-disc pl-5 mb-3 text-sm">
+                        <li>Спочатку охоронець перевіряє: <i>"Чи є ви у списку гостей?"</i> (Перший <code>if</code>).</li>
+                        <li>ТІЛЬКИ якщо ви у списку, він перевіряє далі: <i>"Чи є вам 18 років?"</i> (Другий, <b>вкладений</b> <code>if</code>).</li>
+                    </ul>
+                    <p class="text-sm mb-2">Головне правило в Python для вкладених умов — <b>додатковий відступ</b>. Кожен новий рівень всередині вимагає ще 4 пробіли (разом 4 + 4 = 8 пробілів). Це візуально показує комп'ютеру, що команда знаходиться "всередині всередини".</p>
+                    <div class="font-mono bg-[#1e1e1e] text-[#d4d4d4] p-3 rounded-lg shadow-inner text-sm overflow-x-auto">
+                        <span class="hl-keyword">if</span> у_списку == <span class="hl-string">"так"</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Ви є у списку!"</span>) <span class="hl-comment"># 4 пробіли</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-keyword">if</span> вік &gt;= <span class="hl-number">18</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Вхід дозволено!"</span>) <span class="hl-comment"># 8 пробілів!</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-keyword">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Вибачте, ви ще малі."</span>) <span class="hl-comment"># 8 пробілів!</span><br>
+                        <span class="hl-keyword">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-function">print</span>(<span class="hl-string">"Вас немає у списку."</span>) <span class="hl-comment"># 4 пробіли</span>
+                    </div>
+                </div>
+
+                <!-- Quiz 4 -->
+                <div id="b4-quiz" class="task-block bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-2">📝 Експрес-тест</h3>
+                    
+                    <div class="mb-4">
+                        <p class="font-semibold text-sm mb-2">1. Скільки пробілів має бути перед командою, яка знаходиться всередині `if`, який сам знаходиться всередині іншого `if`?</p>
+                        <label class="block text-sm p-2 hover:bg-red-100 rounded cursor-pointer"><input type="radio" name="q4_1" value="wrong"> 4 пробіли</label>
+                        <label class="block text-sm p-2 hover:bg-red-100 rounded cursor-pointer"><input type="radio" name="q4_1" value="correct"> 8 пробілів</label>
+                        <label class="block text-sm p-2 hover:bg-red-100 rounded cursor-pointer"><input type="radio" name="q4_1" value="wrong"> Без відступів</label>
+                    </div>
+
+                    <button onclick="checkQuiz4()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition">Відповісти</button>
+                    <div id="b4-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 4.1 (Nested) -->
+                <div id="b4-prac1" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 1: "Логін і Пароль"</h3>
+                    <p class="text-sm font-bold mb-2">Напиши вкладену перевірку:</p>
+                    <ol class="list-decimal pl-5 text-sm mb-4">
+                        <li>Зчитай логін: <code>log = input()</code> (без int, бо це текст!).</li>
+                        <li>Якщо логін <code>"admin"</code>, зчитай пароль: <code>pas = input()</code>.
+                            <ul class="list-disc pl-5 mt-1">
+                                <li>Якщо пароль <code>"1234"</code>, виведи <code>"Суперсекрет"</code>.</li>
+                                <li>Інакше (це `else` до внутрішнього `if`) виведи <code>"Невірний пароль"</code>.</li>
+                            </ul>
+                        </li>
+                        <li>Інакше (це `else` до зовнішнього `if`) виведи <code>"Невідомий користувач"</code>.</li>
+                    </ol>
+                    
+                    <div class="editor-container mb-3" style="height: 240px;">
+                        <div id="b4-editor1-hl" class="code-highlight"></div>
+                        <textarea id="b4-editor1" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice4_1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b4-prac1-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Practice 4.2 (Nested) -->
+                <div id="b4-prac2" class="task-block locked bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">💻 Практика 2: "Кінотеатр"</h3>
+                    <p class="text-sm mb-4">Зчитай вік: <code>age = int(input())</code>. <br>Якщо вік &gt;= 12, то спитай тип квитка: <code>ticket = input()</code>. <br>&nbsp;&nbsp;&nbsp;&nbsp;Якщо <code>ticket == "VIP"</code>, виведи <code>"Супер зал"</code>.<br>&nbsp;&nbsp;&nbsp;&nbsp;Інакше виведи <code>"Звичайний зал"</code>.<br>Інакше (якщо вік &lt; 12) виведи <code>"Мультики"</code>.</p>
+                    
+                    <div class="editor-container mb-3" style="height: 220px;">
+                        <div id="b4-editor2-hl" class="code-highlight"></div>
+                        <textarea id="b4-editor2" class="code-input" spellcheck="false"></textarea>
+                    </div>
+                    
+                    <button onclick="checkPractice4_2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Перевірити код</button>
+                    <div id="b4-prac2-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+
+                <!-- Theory & Interactive (Ternary) -->
+                <div id="b4-inter" class="task-block locked bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold mb-2">Тернарний оператор (Фінал)</h3>
+                    <p class="text-sm mb-2">Для лінивих програмістів просте `if-else` можна записати в один рядок:<br>
+                    <code class="bg-white px-2 py-1 rounded shadow-inner font-mono text-sm">змінна = результат_так <span class="text-purple-600 font-bold">if</span> умова <span class="text-purple-600 font-bold">else</span> результат_ні</code></p>
+                    
+                    <p class="text-sm font-bold mt-4 mb-2">Перепиши виділені рядки в один:</p>
+                    <div class="editor-container mb-3" style="height: 180px;">
+                        <div id="b4-final-hl" class="code-highlight"></div>
+                        <textarea id="b4-final" class="code-input" spellcheck="false">
+a = int(input())
+b = int(input())
+# Перепиши наступні 4 рядки в 1 використовуючи max_val = ... if ... else ...
+if a > b:
+    max_val = a
+else:
+    max_val = b
+
+print(max_val)</textarea>
+                    </div>
+                    <button onclick="checkFinal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">Перевірити магію</button>
+                    <div id="b4-final-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Completion Message -->
+        <div id="completion-message" class="hidden text-center py-10">
+            <h2 class="text-4xl font-bold text-green-600 mb-4">🎉 Вітаємо! Курс завершено! 🎉</h2>
+            <p class="text-lg">Ти освоїв розгалуження в Python на відмінно. Твій фінальний бал: <span id="final-score" class="font-bold text-2xl text-blue-600"></span> / 100.</p>
+        </div>
+    </main>
+
+    <script>
+        // State
+        let pyodideInstance = null;
+        let score = 0;
+        let progress = 0;
+        
+        // Total steps to 100%
+        // B1: inter, quiz, prac1, prac2 (4)
+        // B2: fix, quiz, prac1, prac2 (4)
+        // B3: trace, quiz, prac1, prac2 (4)
+        // B4: quiz, prac1, prac2, final (4)
+        const totalSteps = 16; 
+        let stepsCompleted = 0;
+
+        // Track completed tasks to prevent double scoring
+        const completedTasks = new Set();
+
+        // Syntax Highlighting setup for all editors
+        const editors = [
+            { input: 'b1-editor1', hl: 'b1-editor1-hl' },
+            { input: 'b1-editor2', hl: 'b1-editor2-hl' },
+            { input: 'b2-fix', hl: 'b2-fix-hl' },
+            { input: 'b2-editor1', hl: 'b2-editor1-hl' },
+            { input: 'b2-editor2', hl: 'b2-editor2-hl' },
+            { input: 'b3-editor1', hl: 'b3-editor1-hl' },
+            { input: 'b3-editor2', hl: 'b3-editor2-hl' },
+            { input: 'b4-editor1', hl: 'b4-editor1-hl' },
+            { input: 'b4-editor2', hl: 'b4-editor2-hl' },
+            { input: 'b4-final', hl: 'b4-final-hl' }
+        ];
+
+        function highlightCode(text) {
+            let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            // 1. Спочатку обробляємо рядки та коментарі, щоб не пошкодити HTML-теги від наступних замін
+            escaped = escaped.replace(/(["'].*?["'])/g, '<span class="hl-string">$1</span>');
+            escaped = escaped.replace(/(#.*)/g, '<span class="hl-comment">$1</span>');
+            
+            // 2. Потім ключові слова, функції та числа
+            escaped = escaped.replace(/\b(if|else|elif|and|or|not)\b/g, '<span class="hl-keyword">$1</span>');
+            escaped = escaped.replace(/\b(print|input|int|float|str|max)\b/g, '<span class="hl-function">$1</span>');
+            escaped = escaped.replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+            
+            return escaped;
+        }
+
+        function setupEditor(inputId, hlId) {
+            const inputEl = document.getElementById(inputId);
+            const hlEl = document.getElementById(hlId);
+            if(!inputEl || !hlEl) return;
+
+            const updateHl = () => {
+                hlEl.innerHTML = highlightCode(inputEl.value) + '<br>'; 
+                hlEl.scrollTop = inputEl.scrollTop;
+                hlEl.scrollLeft = inputEl.scrollLeft;
+            };
+
+            inputEl.addEventListener('input', updateHl);
+            inputEl.addEventListener('scroll', () => {
+                hlEl.scrollTop = inputEl.scrollTop;
+                hlEl.scrollLeft = inputEl.scrollLeft;
+            });
+            inputEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
+                    updateHl();
+                }
+            });
+            updateHl(); 
+        }
+
+        editors.forEach(ed => setupEditor(ed.input, ed.hl));
+
+        async function initPyodide() {
+            try {
+                pyodideInstance = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/" });
+                const pyWrapper = `
+import sys
+import builtins
+import json
+
+def run_test_case(code, inputs_json):
+    try:
+        inputs = json.loads(inputs_json)
+    except:
+        inputs = []
+        
+    output_list = []
+    input_idx = 0
+    
+    def mock_input(prompt=""):
+        nonlocal input_idx
+        if input_idx < len(inputs):
+            val = inputs[input_idx]
+            input_idx += 1
+            return str(val)
+        return ""
+        
+    def mock_print(*args, sep=" ", end="\\n", **kwargs):
+        output_list.append(" ".join(map(str, args)))
+        
+    orig_input = builtins.input
+    orig_print = builtins.print
+    builtins.input = mock_input
+    builtins.print = mock_print
+    
+    error_msg = ""
+    try:
+        namespace = {}
+        exec(code, namespace)
+    except SyntaxError as e:
+        error_msg = f"SyntaxError: {e.msg} (рядок {e.lineno})"
+    except IndentationError as e:
+        error_msg = f"IndentationError: {e.msg} (рядок {e.lineno})"
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+    finally:
+        builtins.input = orig_input
+        builtins.print = orig_print
+        
+    return json.dumps({"output": "\\n".join(output_list), "error": error_msg})
+`;
+                await pyodideInstance.runPythonAsync(pyWrapper);
+                document.getElementById('loading-overlay').style.display = 'none';
+            } catch (err) {
+                console.error("Pyodide init error:", err);
+                alert("Помилка завантаження середовища. Перевірте підключення до інтернету.");
+            }
+        }
+
+        window.onload = initPyodide;
+
+        async function executePython(code, inputs = []) {
+            if (!pyodideInstance) return { error: "Середовище ще не завантажено!" };
+            const inputsJson = JSON.stringify(inputs);
+            try {
+                pyodideInstance.globals.set("temp_code", code);
+                pyodideInstance.globals.set("temp_inputs", inputsJson);
+                const resRaw = await pyodideInstance.runPythonAsync(`run_test_case(temp_code, temp_inputs)`);
+                return JSON.parse(resRaw);
+            } catch (err) {
+                return { error: "Внутрішня помилка: " + err.message };
+            }
+        }
+
+        function translateError(err) {
+            if (!err) return "";
+            if (err.includes("IndentationError") || err.includes("expected an indented block")) return "❌ Помилка відступів! Здається, ти забув зробити 4 пробіли перед командою всередині блоку (після двокрапки).";
+            if (err.includes("SyntaxError") && (err.includes("expected ':'") || err.includes("invalid syntax"))) return "❌ Синтаксична помилка. Можливо, ти забув поставити двокрапку `:` в кінці рядка з умовою?";
+            if (err.includes("NameError")) return "❌ Програма не знає такої змінної. Перевір, чи правильно написано її назву (вона чутлива до великих/малих літер).";
+            if (err.includes("TypeError") && err.includes("not supported")) return "❌ Схоже, ти намагаєшся порівняти текст із числом. Використовуй int(input()) для зчитування чисел.";
+            if (err.includes("EOFError")) return "❌ Програма очікувала введення (input), але його не було. Перевір логіку.";
+            return "❌ Помилка: " + err;
+        }
+
+        function completeTask(taskId, points, nextElementId) {
+            if (completedTasks.has(taskId)) return; // Already completed
+            completedTasks.add(taskId);
+            
+            score += points;
+            stepsCompleted++;
+            document.getElementById('score-counter').innerText = score;
+            const pct = (stepsCompleted / totalSteps) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            
+            const scoreEl = document.getElementById('score-counter');
+            scoreEl.classList.add('success-anim');
+            setTimeout(() => scoreEl.classList.remove('success-anim'), 500);
+
+            if (nextElementId) {
+                const el = document.getElementById(nextElementId);
+                if (el) {
+                    el.classList.remove('locked');
+                    setTimeout(() => {
+                        const y = el.getBoundingClientRect().top + window.pageYOffset - 100;
+                        window.scrollTo({top: y, behavior: 'smooth'});
+                    }, 300);
+                }
+            }
+
+            if (stepsCompleted === totalSteps) {
+                document.getElementById('completion-message').classList.remove('hidden');
+                document.getElementById('final-score').innerText = score;
+            }
+        }
+
+        function showFeedback(elId, isSuccess, message) {
+            const el = document.getElementById(elId);
+            el.innerHTML = message;
+            el.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'border-red-300', 'border-green-300', 'border');
+            if (isSuccess) el.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-300');
+            else el.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-300');
+        }
+
+        // ================= BLOCK 1 =================
+        async function runBlock1Interactive() {
+            const val = document.getElementById('b1-input').value;
+            const code = `temp = ${val}\nif temp < 0:\n    print("Холодно, одягай шапку!")`;
+            const outEl = document.getElementById('b1-out');
+            outEl.innerText = "Обчислення...";
+            
+            const res = await executePython(code);
+            if (res.error) {
+                outEl.innerText = res.error;
+                outEl.className = "bg-black text-red-400 font-mono p-2 rounded h-12 flex items-center shadow-inner text-sm px-2 overflow-hidden whitespace-nowrap text-ellipsis";
+            } else {
+                outEl.innerText = res.output ? res.output : "> (Нічого не виведено, умова хибна)";
+                outEl.className = "bg-black text-green-400 font-mono p-2 rounded h-12 flex items-center shadow-inner text-sm px-2 overflow-hidden whitespace-nowrap text-ellipsis";
+            }
+            completeTask('b1-inter', 2, 'b1-quiz');
+        }
+
+        function checkQuiz1() {
+            const q1 = document.querySelector('input[name="q1_1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="q1_2"]:checked')?.value;
+            
+            if (!q1 || !q2) { showFeedback('b1-quiz-feedback', false, "⚠️ Будь ласка, дай відповідь на всі питання."); return; }
+            if (q1 === 'correct' && q2 === 'correct') {
+                showFeedback('b1-quiz-feedback', true, "✅ Чудово! Ти засвоїв базові правила.");
+                completeTask('b1-quiz', 3, 'b1-prac1');
+            } else {
+                showFeedback('b1-quiz-feedback', false, "❌ Є помилка. Двокрапка завжди стоїть в кінці умови, а відступ потрібен, щоб Python зрозумів приналежність команди.");
+            }
+        }
+
+        async function checkPractice1_1() {
+            const code = document.getElementById('b1-editor1').value;
+            if(!code.trim()) { showFeedback('b1-prac1-feedback', false, "Спочатку напиши код!"); return; }
+
+            let res1 = await executePython(code, [5]);
+            if (res1.error) { showFeedback('b1-prac1-feedback', false, translateError(res1.error)); return; }
+            if (!res1.output.includes("Додатно")) { showFeedback('b1-prac1-feedback', false, "❌ Якщо ввести число 5, програма повинна вивести 'Додатно'. Твій вивід: '" + res1.output + "'"); return; }
+
+            let res2 = await executePython(code, [-3]);
+            if (res2.output.includes("Додатно")) { showFeedback('b1-prac1-feedback', false, "❌ Якщо ввести від'ємне число, програма НЕ повинна виводити 'Додатно'."); return; }
+
+            showFeedback('b1-prac1-feedback', true, "✅ Супер! Ти написав свій перший if.");
+            completeTask('b1-prac1', 5, 'b1-prac2');
+        }
+
+        async function checkPractice1_2() {
+            const code = document.getElementById('b1-editor2').value;
+            if (!code.includes("==")) { showFeedback('b1-prac2-feedback', false, "❌ Для порівняння потрібно використовувати подвійне дорівнює `==`"); return; }
+
+            let res1 = await executePython(code, ["Python"]);
+            if (res1.error) { showFeedback('b1-prac2-feedback', false, translateError(res1.error)); return; }
+            if (!res1.output.includes("Таємницю розкрито")) { showFeedback('b1-prac2-feedback', false, "❌ Якщо ввести 'Python', програма повинна вивести 'Таємницю розкрито'."); return; }
+
+            let res2 = await executePython(code, ["Java"]);
+            if (res2.output.includes("Таємницю розкрито")) { showFeedback('b1-prac2-feedback', false, "❌ Програма вивела таємницю для неправильного слова 'Java'."); return; }
+
+            showFeedback('b1-prac2-feedback', true, "✅ Ідеально! Йдемо далі.");
+            completeTask('b1-prac2', 10, 'block-2');
+        }
+
+        // ================= BLOCK 2 =================
+        async function checkFix2() {
+            const code = document.getElementById('b2-fix').value;
+            let res = await executePython(code, [10]);
+            
+            if (res.error) {
+                showFeedback('b2-fix-feedback', false, translateError(res.error) + " (Спробуй додати пробіли перед другим print)");
+            } else {
+                showFeedback('b2-fix-feedback', true, "✅ Супер! Відступи — це святе в Python.");
+                completeTask('b2-fix', 5, 'b2-quiz');
+            }
+        }
+
+        function checkQuiz2() {
+            const q1 = document.querySelector('input[name="q2_1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="q2_2"]:checked')?.value;
+            
+            if (!q1 || !q2) { showFeedback('b2-quiz-feedback', false, "⚠️ Будь ласка, дай відповідь на всі питання."); return; }
+            if (q1 === 'correct' && q2 === 'correct') {
+                showFeedback('b2-quiz-feedback', true, "✅ Правильно! `else` ловить все інше і пишеться без відступу зліва.");
+                completeTask('b2-quiz', 3, 'b2-prac1');
+            } else {
+                showFeedback('b2-quiz-feedback', false, "❌ Згадай: `else` не має своєї умови і пишеться на одному рівні з `if`.");
+            }
+        }
+
+        async function checkPractice2_1() {
+            const code = document.getElementById('b2-editor1').value;
+            if (!code.includes("else:")) { showFeedback('b2-prac1-feedback', false, "❌ Здається, ти забув використати команду `else:`"); return; }
+
+            let res1 = await executePython(code, [20]);
+            if(res1.error) { showFeedback('b2-prac1-feedback', false, translateError(res1.error)); return; }
+            if(!res1.output.includes("Вхід дозволено")) { showFeedback('b2-prac1-feedback', false, "❌ Для віку 20 очікується 'Вхід дозволено'."); return; }
+
+            let res2 = await executePython(code, [15]);
+            if(!res2.output.includes("Вхід заборонено")) { showFeedback('b2-prac1-feedback', false, "❌ Для віку 15 очікується 'Вхід заборонено'."); return; }
+
+            showFeedback('b2-prac1-feedback', true, "✅ Все працює як годинник!");
+            completeTask('b2-prac1', 7, 'b2-prac2');
+        }
+
+        async function checkPractice2_2() {
+            const code = document.getElementById('b2-editor2').value;
+            if (!code.includes("% 2")) { showFeedback('b2-prac2-feedback', false, "❌ Використай оператор `% 2 == 0` для перевірки на парність."); return; }
+
+            let res1 = await executePython(code, [10]);
+            if(res1.error) { showFeedback('b2-prac2-feedback', false, translateError(res1.error)); return; }
+            if(!res1.output.includes("Парне")) { showFeedback('b2-prac2-feedback', false, "❌ Для числа 10 очікується 'Парне'."); return; }
+
+            let res2 = await executePython(code, [7]);
+            if(!res2.output.includes("Непарне")) { showFeedback('b2-prac2-feedback', false, "❌ Для числа 7 очікується 'Непарне'."); return; }
+
+            showFeedback('b2-prac2-feedback', true, "✅ Відмінно! Тепер ти знаєш, як працює математика в умовах.");
+            completeTask('b2-prac2', 10, 'block-3');
+        }
+
+        // ================= BLOCK 3 =================
+        function checkQuiz3_Trace() {
+            const val = document.getElementById('b3-quiz-input').value.trim().toLowerCase();
+            if (val === "осінь" || val === "osin") {
+                showFeedback('b3-trace-feedback', true, "✅ Правильно! Бо 10 не підпадає під жодну з умов if/elif, тому спрацьовує else.");
+                completeTask('b3-inter', 5, 'b3-quiz');
+            } else {
+                showFeedback('b3-trace-feedback', false, "❌ Неправильно. Подумай: 10 дорівнює 1, 2 або 12? Ні. Воно між 3 і 5? Ні. Значить спрацює...");
+            }
+        }
+
+        function checkQuiz3() {
+            const q1 = document.querySelector('input[name="q3_1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="q3_2"]:checked')?.value;
+            
+            if (!q1 || !q2) { showFeedback('b3-quiz-feedback', false, "⚠️ Будь ласка, дай відповідь на всі питання."); return; }
+            if (q1 === 'correct' && q2 === 'correct') {
+                showFeedback('b3-quiz-feedback', true, "✅ Молодчина! `and` дуже строгий, вимагає щоб все було правдою.");
+                completeTask('b3-quiz', 3, 'b3-prac1');
+            } else {
+                showFeedback('b3-quiz-feedback', false, "❌ Уважно прочитай питання. `elif` - це додатковий варіант, а `and` вимагає 100% співпадіння всіх умов.");
+            }
+        }
+
+        async function checkPractice3_1() {
+            const code = document.getElementById('b3-editor1').value;
+            if (!code.includes("elif")) { showFeedback('b3-prac1-feedback', false, "❌ Використай команду `elif` для перевірки проміжного варіанту (від 7 до 10)."); return; }
+
+            const tests = [{ input: 11, exp: "Високий" }, { input: 8, exp: "Достатній" }, { input: 4, exp: "Треба попрацювати" }];
+            for (let t of tests) {
+                let res = await executePython(code, [t.input]);
+                if (res.error) { showFeedback('b3-prac1-feedback', false, translateError(res.error)); return; }
+                if (!res.output.includes(t.exp)) { showFeedback('b3-prac1-feedback', false, `❌ Для балу ${t.input} очікується '${t.exp}'.`); return; }
+            }
+
+            showFeedback('b3-prac1-feedback', true, "✅ Чудова робота! Ти приборкав множинний вибір.");
+            completeTask('b3-prac1', 7, 'b3-prac2');
+        }
+
+        async function checkPractice3_2() {
+            const code = document.getElementById('b3-editor2').value;
+            const tests = [
+                { input: "червоний", exp: "Стій" }, 
+                { input: "жовтий", exp: "Увага" }, 
+                { input: "зелений", exp: "Йди" },
+                { input: "синій", exp: "Зламався" }
+            ];
+            for (let t of tests) {
+                let res = await executePython(code, [t.input]);
+                if (res.error) { showFeedback('b3-prac2-feedback', false, translateError(res.error)); return; }
+                if (!res.output.includes(t.exp)) { showFeedback('b3-prac2-feedback', false, `❌ Для кольору '${t.input}' очікується '${t.exp}'. Твій результат: ${res.output}`); return; }
+            }
+
+            showFeedback('b3-prac2-feedback', true, "✅ Круто! Світлофор працює надійно.");
+            completeTask('b3-prac2', 10, 'block-4');
+        }
+
+        // ================= BLOCK 4 =================
+        function checkQuiz4() {
+            const q1 = document.querySelector('input[name="q4_1"]:checked')?.value;
+            if (!q1) { showFeedback('b4-quiz-feedback', false, "⚠️ Обери варіант відповіді."); return; }
+            if (q1 === 'correct') {
+                showFeedback('b4-quiz-feedback', true, "✅ Абсолютно точно! Кожен новий `if` додає ще 4 пробіли.");
+                completeTask('b4-quiz', 5, 'b4-prac1');
+            } else {
+                showFeedback('b4-quiz-feedback', false, "❌ Ні, кожен рівень вкладеності додає ще 4 пробіли (4 + 4 = 8).");
+            }
+        }
+
+        async function checkPractice4_1() {
+            const code = document.getElementById('b4-editor1').value;
+            let res1 = await executePython(code, ["admin", "1234"]);
+            if(res1.error) { showFeedback('b4-prac1-feedback', false, translateError(res1.error)); return; }
+            if(!res1.output.includes("Суперсекрет")) { showFeedback('b4-prac1-feedback', false, "❌ Якщо логін 'admin' і пароль '1234', очікується 'Суперсекрет'."); return; }
+
+            let res2 = await executePython(code, ["admin", "0000"]);
+            if(!res2.output.includes("Невірний пароль")) { showFeedback('b4-prac1-feedback', false, "❌ Якщо логін 'admin', але пароль '0000', очікується 'Невірний пароль'."); return; }
+
+            let res3 = await executePython(code, ["guest", "whatever"]); 
+            if(!res3.output.includes("Невідомий користувач")) { showFeedback('b4-prac1-feedback', false, "❌ Якщо логін 'guest', очікується 'Невідомий користувач'."); return; }
+
+            showFeedback('b4-prac1-feedback', true, "✅ Складна логіка підкорена!");
+            completeTask('b4-prac1', 10, 'b4-prac2');
+        }
+
+        async function checkPractice4_2() {
+            const code = document.getElementById('b4-editor2').value;
+            
+            // 12+, VIP
+            let res1 = await executePython(code, [15, "VIP"]);
+            if(res1.error) { showFeedback('b4-prac2-feedback', false, translateError(res1.error)); return; }
+            if(!res1.output.includes("Супер зал")) { showFeedback('b4-prac2-feedback', false, "❌ Для 15 років і VIP квитка очікується 'Супер зал'."); return; }
+
+            // 12+, Not VIP
+            let res2 = await executePython(code, [14, "STD"]);
+            if(!res2.output.includes("Звичайний зал")) { showFeedback('b4-prac2-feedback', false, "❌ Для 14 років і не VIP квитка очікується 'Звичайний зал'."); return; }
+
+            // < 12
+            let res3 = await executePython(code, [10, "VIP"]); 
+            if(!res3.output.includes("Мультики")) { showFeedback('b4-prac2-feedback', false, "❌ Для віку 10 очікується 'Мультики', навіть якщо квиток VIP."); return; }
+
+            showFeedback('b4-prac2-feedback', true, "✅ Молодець! Вкладені умови працюють ідеально.");
+            completeTask('b4-prac2', 10, 'b4-inter');
+        }
+
+        async function checkFinal() {
+            const code = document.getElementById('b4-final').value;
+            if (!(code.includes("if") && code.includes("else") && !code.includes(":\n"))) {
+                 showFeedback('b4-final-feedback', false, "❌ Спробуй використати синтаксис: `max_val = a if a > b else b`");
+                 return;
+            }
+
+            let res1 = await executePython(code, [10, 5]);
+            if(res1.error) { showFeedback('b4-final-feedback', false, translateError(res1.error)); return; }
+            if(res1.output.trim() !== "10") { showFeedback('b4-final-feedback', false, "❌ Неправильний результат обчислення."); return; }
+
+            let res2 = await executePython(code, [3, 8]);
+            if(res2.output.trim() !== "8") { showFeedback('b4-final-feedback', false, "❌ Неправильний результат обчислення."); return; }
+
+            showFeedback('b4-final-feedback', true, "✅ Блискуче! Ти пишеш код як справжній Senior!");
+            completeTask('b4-final', 5, null);
+        }
+    </script>
+</body>
+</html>
