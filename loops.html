@@ -68,10 +68,10 @@
                 <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
                     <h3 class="font-bold text-orange-900 mb-2">Повторюй, поки умова правдива</h3>
                     <p class="mb-3">Цикл <code>while</code> виконує команди з відступом знову й знову, доки умова залишається істинною. Щоб цикл колись завершився, змінюй значення, від якого залежить умова.</p>
-                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>лічильник = 1
-while лічильник &lt;= 3:
-    print(лічильник)
-    лічильник += 1</code></pre>
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>counter = 1
+while counter &lt;= 3:
+    print(counter)
+    counter += 1</code></pre>
                     <p class="text-sm text-orange-900 mt-3">Після кожного повторення лічильник зростає на 1. Коли він стане більшим за 3, цикл зупиниться.</p>
                 </div>
 
@@ -104,8 +104,19 @@ while лічильник &lt;= 3:
                 </div>
 
                 <div id="w1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 class="font-bold text-green-900 mb-2">Практика: порахуй до N</h3>
-                    <p class="text-sm mb-3">Зчитай число командою <code>n = int(input())</code> і за допомогою <code>while</code> виведи числа від 1 до <code>n</code> включно, кожне з нового рядка.</p>
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> зчитай <code>n</code> і виведи числа від 1 до <code>n</code> включно.</li>
+                        <li><strong>Середній:</strong> зчитай <code>n</code> і виведи числа від <code>n</code> до 1 у зворотному порядку.</li>
+                        <li><strong>Виклик:</strong> зчитай <code>n</code> і знайди суму парних чисел від 1 до <code>n</code> включно.</li>
+                    </ol>
+                    <label for="while-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="while-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
                     <div class="editor-container mb-3" style="height: 180px">
                         <pre id="while-editor-hl" class="code-highlight" aria-hidden="true"></pre>
                         <textarea id="while-editor" class="code-input font-mono" aria-label="Код для вправи while" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
@@ -125,9 +136,9 @@ while лічильник &lt;= 3:
                 <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
                     <h3 class="font-bold text-teal-900 mb-2">Перебирай послідовність</h3>
                     <p class="mb-3"><code>for</code> зручний, коли треба перебрати послідовність або повторити дію задану кількість разів. <code>range(1, 5)</code> генерує числа 1, 2, 3, 4: початок входить, а кінцева межа 5 не входить.</p>
-                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>for число in range(1, 5):
-    print(число)</code></pre>
-                    <p class="text-sm text-teal-900 mt-3">У <code>range(старт, стоп, крок)</code> параметр <code>крок</code> необов'язковий. Наприклад, <code>range(2, 8, 2)</code> дає 2, 4, 6.</p>
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>for number in range(1, 5):
+    print(number)</code></pre>
+                    <p class="text-sm text-teal-900 mt-3">У <code>range(start, stop, step)</code> параметр <code>step</code> необов'язковий. Наприклад, <code>range(2, 8, 2)</code> дає 2, 4, 6.</p>
                 </div>
 
                 <div id="f1-inter" class="task-block bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -162,8 +173,19 @@ while лічильник &lt;= 3:
                 </div>
 
                 <div id="f1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 class="font-bold text-green-900 mb-2">Практика: сума чисел</h3>
-                    <p class="text-sm mb-3">Зчитай ціле число <code>n</code> і за допомогою циклу <code>for</code> та <code>range()</code> обчисли суму чисел від 1 до <code>n</code> включно. Виведи лише суму. Якщо <code>n</code> дорівнює 0, результат має бути 0.</p>
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> зчитай <code>n</code> і виведи суму чисел від 1 до <code>n</code> включно. Для <code>n = 0</code> виведи 0.</li>
+                        <li><strong>Середній:</strong> зчитай <code>n</code> і виведи всі числа, кратні 3, від 1 до <code>n</code>.</li>
+                        <li><strong>Виклик:</strong> зчитай <code>n</code> і обчисли <code>n!</code> (добуток цілих чисел від 1 до <code>n</code>). Для <code>n = 0</code> виведи 1.</li>
+                    </ol>
+                    <label for="for-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="for-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
                     <div class="editor-container mb-3" style="height: 180px">
                         <pre id="for-editor-hl" class="code-highlight" aria-hidden="true"></pre>
                         <textarea id="for-editor" class="code-input font-mono" aria-label="Код для вправи for" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
@@ -183,12 +205,12 @@ while лічильник &lt;= 3:
                 <div class="bg-rose-50 p-4 rounded-lg border border-rose-100">
                     <h3 class="font-bold text-rose-900 mb-2">Зупиняй і пропускай</h3>
                     <p class="mb-3"><code>break</code> повністю завершує цикл. <code>continue</code> пропускає решту команд у поточному повторенні та переходить до наступного.</p>
-                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>for число in range(1, 8):
-    if число == 3:
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>for number in range(1, 8):
+    if number == 3:
         continue
-    if число == 6:
+    if number == 6:
         break
-    print(число)</code></pre>
+    print(number)</code></pre>
                     <p class="text-sm text-rose-900 mt-3">Цей приклад виведе 1, 2, 4, 5: число 3 пропускається, а на числі 6 цикл завершується.</p>
                 </div>
 
@@ -218,8 +240,19 @@ while лічильник &lt;= 3:
                 </div>
 
                 <div id="c1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 class="font-bold text-green-900 mb-2">Фінальна практика: фільтр чисел</h3>
-                    <p class="text-sm mb-3">За допомогою <code>for</code> перебери числа від 1 до 10. Пропусти числа, що діляться на 3, за допомогою <code>continue</code>. Коли дійдеш до 8, зупини цикл через <code>break</code>. Виведи кожне інше число з нового рядка.</p>
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> перебери числа від 1 до 7 і пропусти 3 за допомогою <code>continue</code>.</li>
+                        <li><strong>Середній:</strong> перебери числа від 1 до 7 і заверши цикл на 6 за допомогою <code>break</code>.</li>
+                        <li><strong>Виклик:</strong> перебери числа від 1 до 10, пропускай числа, кратні 3, а на 8 заверши цикл. Використай і <code>continue</code>, і <code>break</code>.</li>
+                    </ol>
+                    <label for="control-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="control-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
                     <div class="editor-container mb-3" style="height: 200px">
                         <pre id="control-editor-hl" class="code-highlight" aria-hidden="true"></pre>
                         <textarea id="control-editor" class="code-input font-mono" aria-label="Код фінальної вправи" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
@@ -420,12 +453,18 @@ def run_test_case(code, inputs_json):
             const code = document.getElementById('while-editor').value;
             if (!code.trim()) return showFeedback('w1-practice-feedback', false, 'Спочатку напиши код.');
             if (!/\bwhile\b/.test(code)) return showFeedback('w1-practice-feedback', false, 'Для цього завдання використай цикл while.');
-            for (const [input, expected] of [[3, '1\n2\n3'], [1, '1']]) {
+            const level = document.getElementById('while-level').value;
+            const cases = {
+                basic: [[3, '1\n2\n3'], [1, '1']],
+                medium: [[3, '3\n2\n1'], [1, '1']],
+                challenge: [[5, '6'], [1, '0'], [0, '0']]
+            };
+            for (const [input, expected] of cases[level]) {
                 const result = await executePython(code, [input]);
                 if (result.error) return showFeedback('w1-practice-feedback', false, result.error);
                 if (result.output.trim() !== expected) return showFeedback('w1-practice-feedback', false, `Для введення ${input} очікується:\n${expected}`);
             }
-            showFeedback('w1-practice-feedback', true, 'Чудово! Цикл виводить числа до N включно.');
+            showFeedback('w1-practice-feedback', true, 'Чудово! Обраний рівень пройдено на кількох тестових значеннях.');
             completeTask('w1-practice', 15, 'block-2');
         }
 
@@ -448,12 +487,18 @@ def run_test_case(code, inputs_json):
             const code = document.getElementById('for-editor').value;
             if (!code.trim()) return showFeedback('f1-practice-feedback', false, 'Спочатку напиши код.');
             if (!/\bfor\b/.test(code) || !/\brange\s*\(/.test(code)) return showFeedback('f1-practice-feedback', false, 'Використай for і range() для перебору чисел.');
-            for (const [input, expected] of [[5, '15'], [1, '1'], [0, '0']]) {
+            const level = document.getElementById('for-level').value;
+            const cases = {
+                basic: [[5, '15'], [1, '1'], [0, '0']],
+                medium: [[10, '3\n6\n9'], [3, '3']],
+                challenge: [[5, '120'], [1, '1'], [0, '1']]
+            };
+            for (const [input, expected] of cases[level]) {
                 const result = await executePython(code, [input]);
                 if (result.error) return showFeedback('f1-practice-feedback', false, result.error);
-                if (result.output.trim() !== expected) return showFeedback('f1-practice-feedback', false, `Для n = ${input} очікується сума ${expected}.`);
+                if (result.output.trim() !== expected) return showFeedback('f1-practice-feedback', false, `Для n = ${input} очікується результат:\n${expected}`);
             }
-            showFeedback('f1-practice-feedback', true, 'Вірно! Перевірено на кількох значеннях, зокрема на нулі.');
+            showFeedback('f1-practice-feedback', true, 'Вірно! Обраний рівень пройдено на кількох тестових значеннях.');
             completeTask('f1-practice', 15, 'block-3');
         }
 
@@ -469,11 +514,18 @@ def run_test_case(code, inputs_json):
         async function checkControlPractice() {
             const code = document.getElementById('control-editor').value;
             if (!code.trim()) return showFeedback('c1-practice-feedback', false, 'Спочатку напиши код.');
-            if (!/\bbreak\b/.test(code) || !/\bcontinue\b/.test(code)) return showFeedback('c1-practice-feedback', false, 'У розв’язанні мають бути і break, і continue.');
+            const level = document.getElementById('control-level').value;
+            if (level !== 'medium' && !/\bcontinue\b/.test(code)) return showFeedback('c1-practice-feedback', false, 'Для цього рівня використай continue.');
+            if (level !== 'basic' && !/\bbreak\b/.test(code)) return showFeedback('c1-practice-feedback', false, 'Для цього рівня використай break.');
             const result = await executePython(code);
             if (result.error) return showFeedback('c1-practice-feedback', false, result.error);
-            if (result.output.trim() !== '1\n2\n4\n5\n7') return showFeedback('c1-practice-feedback', false, 'Очікуваний вивід: 1, 2, 4, 5, 7, кожне число з нового рядка. Перевір межі циклу та порядок перевірок.');
-            showFeedback('c1-practice-feedback', true, 'Урок пройдено! Ти керуєш і повтореннями, і перебігом циклу.');
+            const expected = {
+                basic: '1\n2\n4\n5\n6\n7',
+                medium: '1\n2\n3\n4\n5',
+                challenge: '1\n2\n4\n5\n7'
+            };
+            if (result.output.trim() !== expected[level]) return showFeedback('c1-practice-feedback', false, `Для обраного рівня очікується вивід:\n${expected[level]}`);
+            showFeedback('c1-practice-feedback', true, 'Вірно! Обраний рівень пройдено.');
             completeTask('c1-practice', 25, null);
         }
     </script>
