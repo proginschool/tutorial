@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтерактивний урок: Цикли в C++</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .section-block, .task-block { transition: all 0.5s ease; }
+        .locked { opacity: 0.4; pointer-events: none; filter: grayscale(80%); user-select: none; }
+        .editor-container { position: relative; border-radius: 0.5rem; overflow: hidden; background-color: #1e1e1e; border: 2px solid #374151; }
+        .editor-container:focus-within { border-color: #0d9488; }
+        .code-highlight, .code-input {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 1rem; margin: 0; border: none; font-size: 0.9rem; line-height: 1.5;
+            white-space: pre; overflow: auto;
+        }
+        .code-input { color: transparent; background: transparent; caret-color: white; z-index: 10; resize: none; outline: none; }
+        .code-highlight { color: #d4d4d4; z-index: 5; pointer-events: none; }
+        .hl-keyword { color: #c586c0; font-weight: bold; }
+        .hl-function { color: #dcdcaa; }
+        .hl-string { color: #ce9178; }
+        .hl-number { color: #b5cea8; }
+        .hl-comment { color: #6a9955; font-style: italic; }
+        .success-anim { animation: bounce-success 0.5s ease; color: #10b981; font-weight: bold; }
+        @keyframes bounce-success { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .loader { border: 4px solid #e5e7eb; border-top: 4px solid #0d9488; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="pb-20">
+    <header class="sticky top-0 z-50 bg-white shadow-md w-full px-4 py-3 flex items-center justify-between gap-4">
+        <a href="index.html" class="font-semibold text-teal-700 hover:text-teal-900 whitespace-nowrap">← До курсу</a>
+        <div class="flex items-center gap-3 w-full max-w-md">
+            <span class="font-bold text-sm hidden sm:block">Прогрес</span>
+            <div class="w-full bg-gray-200 rounded-full h-3" role="progressbar" aria-label="Прогрес уроку" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progress-bar" class="bg-teal-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="font-bold text-sm sm:text-base text-teal-800 bg-teal-100 px-3 py-2 rounded-lg whitespace-nowrap">
+            Бали: <span id="score-counter">0</span>/100
+        </div>
+    </header>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[60] flex flex-col items-center justify-center px-5 text-center">
+        <div class="loader mb-4"></div>
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Завантаження уроку C++...</h2>
+        <p class="text-sm text-gray-500 mt-2">Для компіляції після запуску вправ потрібне підключення до інтернету.</p>
+    </div>
+
+    <main class="max-w-4xl mx-auto mt-8 px-4 space-y-10">
+        <div class="text-center mb-8">
+            <p class="text-sm font-bold uppercase tracking-wide text-teal-700 mb-2">Практичний урок · C++17</p>
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-3">Цикли в C++</h1>
+            <p class="text-lg text-gray-600">Навчи програму повторювати команди та керувати повтореннями.</p>
+            <p class="text-sm text-gray-500 mt-3">Код компілюється онлайн у Wandbox (GCC 13.2, C++17). Надіслані програми та дані вводу передаються цьому сервісу.</p>
+        </div>
+
+        <section id="block-1" class="section-block bg-white p-5 sm:p-6 rounded-xl shadow-lg border-t-4 border-orange-500">
+            <h2 class="text-2xl font-bold mb-5 flex items-center gap-3">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">1</span>
+                Цикл <code>while</code>
+            </h2>
+            <div class="space-y-5">
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                    <h3 class="font-bold text-orange-900 mb-2">Повторюй, поки умова істинна</h3>
+                    <p class="mb-3">C++ перевіряє умову <code>while</code> перед кожним повторенням. Команди циклу беруться у фігурні дужки <code>{ }</code>. Змінюй значення, від якого залежить умова, інакше цикл може не завершитися.</p>
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>#include &lt;iostream&gt;
+
+int main() {
+    int counter = 1;
+    while (counter &lt;= 3) {
+        std::cout &lt;&lt; counter &lt;&lt; '\n';
+        ++counter;
+    }
+    return 0;
+}</code></pre>
+                    <p class="text-sm text-orange-900 mt-3"><code>std::cin</code> читає дані, а <code>std::cout</code> виводить їх. У прикладі <code>counter</code> збільшується на 1 після кожного кроку.</p>
+                </div>
+
+                <div id="w1-inter" class="task-block bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-bold mb-2">Досліди лічильник</h3>
+                    <p class="text-sm mb-3">Зміни межу та подивись, скільки разів виконається цикл.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+                        <label class="text-sm font-medium">Рахувати до
+                            <input id="while-limit" type="number" min="1" max="20" value="5" class="block mt-1 w-28 rounded border border-gray-300 px-3 py-2">
+                        </label>
+                        <button onclick="runWhileDemo()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">Компілювати й запустити</button>
+                    </div>
+                    <pre id="while-output" class="mt-3 min-h-12 bg-gray-900 text-green-300 font-mono text-sm p-3 rounded overflow-x-auto whitespace-pre-wrap" aria-live="polite">Результат з'явиться тут</pre>
+                </div>
+
+                <div id="w1-quiz" class="task-block locked bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="font-bold text-yellow-900 mb-3">Мінітест</h3>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">1. Коли перевіряється умова <code>while</code>?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="wq1" value="wrong"> Лише після завершення циклу</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="wq1" value="correct"> Перед кожним повторенням</label>
+                    </fieldset>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">2. Що допоможе циклу завершитися?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="wq2" value="correct"> Змінювати значення, яке перевіряє умова</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="wq2" value="wrong"> Додати ще один виклик <code>std::cout</code></label>
+                    </fieldset>
+                    <button onclick="checkWhileQuiz()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded">Відповісти</button>
+                    <div id="w1-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <div id="w1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <p class="text-sm mb-2">Напиши повну програму C++ з <code>main()</code> та потрібними заголовками.</p>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> зчитай <code>n</code> і виведи числа від 1 до <code>n</code> включно, кожне з нового рядка.</li>
+                        <li><strong>Середній:</strong> зчитай <code>n</code> і виведи числа від <code>n</code> до 1 у зворотному порядку.</li>
+                        <li><strong>Виклик:</strong> зчитай <code>n</code> і виведи суму парних чисел від 1 до <code>n</code> включно.</li>
+                    </ol>
+                    <label for="while-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="while-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
+                    <div class="editor-container mb-3" style="height: 200px">
+                        <pre id="while-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="while-editor" class="code-input font-mono" aria-label="Код для вправи while" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkWhilePractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="w1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <details class="task-block bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <summary class="cursor-pointer font-bold text-orange-900">Олімпіадна задача: найбільший простий дільник</summary>
+                    <p class="text-sm mt-3 mb-2">Дано ціле число <code>n ≥ 2</code>. Знайди та виведи його найбільший простий дільник. Використай цикл <code>while</code>, щоб послідовно знаходити й прибирати дільники. Обмеження: <code>n ≤ 1 000 000 000</code>.</p>
+                    <p class="text-sm mb-3">Приклади: <code>84 → 7</code>, <code>97 → 97</code>, <code>100 → 5</code>.</p>
+                    <div class="editor-container mb-3" style="height: 230px">
+                        <pre id="while-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="while-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі while" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkWhileOlympiad()" class="bg-orange-700 hover:bg-orange-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="while-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
+            </div>
+        </section>
+
+        <section id="block-2" class="section-block locked bg-white p-5 sm:p-6 rounded-xl shadow-lg border-t-4 border-teal-600">
+            <h2 class="text-2xl font-bold mb-5 flex flex-wrap items-center gap-3">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">2</span>
+                Цикл <code>for</code>
+            </h2>
+            <div class="space-y-5">
+                <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
+                    <h3 class="font-bold text-teal-900 mb-2">Керуй кількістю повторень</h3>
+                    <p class="mb-3">У циклі <code>for (ініціалізація; умова; крок)</code> спочатку створюється лічильник, потім перед кожним кроком перевіряється умова, а після тіла виконується крок. За умови <code>i &lt; stop</code> число <code>stop</code> не входить у послідовність.</p>
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>#include &lt;iostream&gt;
+
+int main() {
+    for (int number = 1; number &lt; 5; ++number) {
+        std::cout &lt;&lt; number &lt;&lt; '\n';
+    }
+    return 0;
+}</code></pre>
+                    <p class="text-sm text-teal-900 mt-3">На відміну від Python, у C++ немає вбудованої <code>range()</code>: початок, межу й крок задають у заголовку циклу.</p>
+                </div>
+
+                <div id="f1-inter" class="task-block bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-bold mb-2">Досліди межі циклу</h3>
+                    <p class="text-sm mb-3">Зміни початок і кінець. Кінцева межа не потрапляє у вивід.</p>
+                    <div class="flex flex-wrap items-end gap-3">
+                        <label class="text-sm font-medium">Початок
+                            <input id="range-start" type="number" min="-10" max="20" value="1" class="block mt-1 w-24 rounded border border-gray-300 px-3 py-2">
+                        </label>
+                        <label class="text-sm font-medium">Кінець
+                            <input id="range-stop" type="number" min="-10" max="20" value="6" class="block mt-1 w-24 rounded border border-gray-300 px-3 py-2">
+                        </label>
+                        <button onclick="runForDemo()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-4 rounded">Компілювати й запустити</button>
+                    </div>
+                    <pre id="for-output" class="mt-3 min-h-12 bg-gray-900 text-green-300 font-mono text-sm p-3 rounded overflow-x-auto whitespace-pre-wrap" aria-live="polite">Результат з'явиться тут</pre>
+                </div>
+
+                <div id="f1-quiz" class="task-block locked bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="font-bold text-yellow-900 mb-3">Мінітест</h3>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">1. Що виведе цикл <code>for (int i = 2; i &lt; 5; ++i)</code>?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="fq1" value="correct"> 2, 3, 4</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="fq1" value="wrong"> 2, 3, 4, 5</label>
+                    </fieldset>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">2. Скільки разів виконається <code>for (int i = 0; i &lt; 3; ++i)</code>?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="fq2" value="wrong"> Два рази</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="fq2" value="correct"> Три рази: для 0, 1, 2</label>
+                    </fieldset>
+                    <button onclick="checkForQuiz()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded">Відповісти</button>
+                    <div id="f1-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <div id="f1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <p class="text-sm mb-2">Напиши повну програму C++ з <code>main()</code> та потрібними заголовками.</p>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> зчитай <code>n</code> і виведи суму чисел від 1 до <code>n</code> включно. Для <code>n = 0</code> виведи 0.</li>
+                        <li><strong>Середній:</strong> зчитай <code>n</code> і виведи всі числа, кратні 3, від 1 до <code>n</code>.</li>
+                        <li><strong>Виклик:</strong> зчитай <code>n</code> і обчисли <code>n!</code>. Для <code>n = 0</code> виведи 1.</li>
+                    </ol>
+                    <label for="for-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="for-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
+                    <div class="editor-container mb-3" style="height: 200px">
+                        <pre id="for-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="for-editor" class="code-input font-mono" aria-label="Код для вправи for" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkForPractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="f1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <details class="task-block bg-teal-50 p-4 rounded-lg border border-teal-200">
+                    <summary class="cursor-pointer font-bold text-teal-900">Олімпіадна задача: піфагорові трійки</summary>
+                    <p class="text-sm mt-3 mb-2">Дано число <code>n</code> (<code>1 ≤ n ≤ 20</code>). Порахуй усі трійки цілих чисел <code>a &lt; b &lt; c ≤ n</code>, для яких <code>a² + b² = c²</code>. Виведи кількість трійок. Перебери можливі значення вкладеними циклами <code>for</code>.</p>
+                    <p class="text-sm mb-3">Приклади: <code>n = 5 → 1</code>, <code>n = 10 → 2</code>, <code>n = 20 → 6</code>.</p>
+                    <div class="editor-container mb-3" style="height: 250px">
+                        <pre id="for-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="for-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі for" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkForOlympiad()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="for-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
+            </div>
+        </section>
+
+        <section id="block-3" class="section-block locked bg-white p-5 sm:p-6 rounded-xl shadow-lg border-t-4 border-rose-500">
+            <h2 class="text-2xl font-bold mb-5 flex items-center gap-3">
+                <span class="bg-rose-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">3</span>
+                Керування циклом
+            </h2>
+            <div class="space-y-5">
+                <div class="bg-rose-50 p-4 rounded-lg border border-rose-100">
+                    <h3 class="font-bold text-rose-900 mb-2">Зупиняй і пропускай</h3>
+                    <p class="mb-3"><code>break</code> завершує найближчий цикл, а <code>continue</code> пропускає решту поточного повторення й переходить до наступного. У вкладених циклах ці команди діють лише на найглибший цикл.</p>
+                    <pre class="font-mono text-sm bg-white p-3 rounded shadow-inner overflow-x-auto"><code>#include &lt;iostream&gt;
+
+int main() {
+    for (int number = 1; number &lt; 8; ++number) {
+        if (number == 3) {
+            continue;
+        }
+        if (number == 6) {
+            break;
+        }
+        std::cout &lt;&lt; number &lt;&lt; '\n';
+    }
+    return 0;
+}</code></pre>
+                    <p class="text-sm text-rose-900 mt-3">Приклад виведе 1, 2, 4, 5: число 3 пропускається, а на числі 6 цикл завершується.</p>
+                </div>
+
+                <div id="c1-inter" class="task-block bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-bold mb-2">Передбач результат</h3>
+                    <p class="text-sm mb-3">Скомпілюй приклад і перевір, яке число пропускається та на якому цикл зупиняється.</p>
+                    <button onclick="runControlDemo()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded">Компілювати й запустити</button>
+                    <pre id="control-output" class="mt-3 min-h-12 bg-gray-900 text-green-300 font-mono text-sm p-3 rounded overflow-x-auto whitespace-pre-wrap" aria-live="polite">Результат з'явиться тут</pre>
+                </div>
+
+                <div id="c1-quiz" class="task-block locked bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="font-bold text-yellow-900 mb-3">Мінітест</h3>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">1. Що робить <code>break</code>?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="cq1" value="wrong"> Пропускає одну команду в тілі циклу</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="cq1" value="correct"> Завершує найближчий цикл</label>
+                    </fieldset>
+                    <fieldset class="mb-4">
+                        <legend class="font-semibold text-sm mb-2">2. Що робить <code>continue</code>?</legend>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="cq2" value="correct"> Переходить до наступного повторення циклу</label>
+                        <label class="block text-sm p-2 hover:bg-yellow-100 rounded"><input type="radio" name="cq2" value="wrong"> Завершує всю програму</label>
+                    </fieldset>
+                    <button onclick="checkControlQuiz()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded">Відповісти</button>
+                    <div id="c1-quiz-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <div id="c1-practice" class="task-block locked bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-900 mb-2">Практика: обери рівень</h3>
+                    <p class="text-sm mb-2">Напиши повну програму C++ з <code>main()</code> та потрібними заголовками.</p>
+                    <ol class="text-sm list-decimal pl-5 mb-3 space-y-1">
+                        <li><strong>Базовий:</strong> перебери числа від 1 до 7 і пропусти 3 за допомогою <code>continue</code>.</li>
+                        <li><strong>Середній:</strong> перебери числа від 1 до 7 і заверши цикл на 6 за допомогою <code>break</code>.</li>
+                        <li><strong>Виклик:</strong> перебери числа від 1 до 10, пропускай числа, кратні 3, а на 8 заверши цикл. Використай і <code>continue</code>, і <code>break</code>.</li>
+                    </ol>
+                    <label for="control-level" class="block text-sm font-medium mb-3">Рівень для перевірки
+                        <select id="control-level" class="block mt-1 rounded border border-gray-300 px-3 py-2">
+                            <option value="basic">Базовий</option>
+                            <option value="medium">Середній</option>
+                            <option value="challenge">Виклик</option>
+                        </select>
+                    </label>
+                    <div class="editor-container mb-3" style="height: 210px">
+                        <pre id="control-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="control-editor" class="code-input font-mono" aria-label="Код вправи break і continue" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkControlPractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="c1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </div>
+
+                <details class="task-block bg-rose-50 p-4 rounded-lg border border-rose-200">
+                    <summary class="cursor-pointer font-bold text-rose-900">Олімпіадна задача: число з простою сумою цифр</summary>
+                    <p class="text-sm mt-3 mb-2">На вході послідовність цілих чисел, по одному на рядок; <code>0</code> завершує ввід. Ігноруй від’ємні числа. Знайди перше додатне число, яке ділиться на суму своїх цифр, причому ця сума є простим числом. Виведи знайдене число або <code>-1</code>, якщо його немає. Використай <code>continue</code> для пропуску значень і <code>break</code> для завершення пошуку. Модуль числа не перевищує <code>1 000 000 000</code>.</p>
+                    <p class="text-sm mb-3">Приклад: <code>-7, 11, 12, 30, 0 → 12</code>.</p>
+                    <div class="editor-container mb-3" style="height: 270px">
+                        <pre id="control-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="control-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі break і continue" spellcheck="false" placeholder="Напиши повну програму C++ тут"></textarea>
+                    </div>
+                    <button onclick="checkControlOlympiad()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-2 px-5 rounded">Перевірити програму</button>
+                    <div id="control-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
+            </div>
+        </section>
+
+        <div id="completion-message" class="hidden text-center py-8">
+            <h2 class="text-3xl font-bold text-green-700 mb-3">Урок завершено!</h2>
+            <p class="text-lg">Твій результат: <strong id="final-score" class="text-2xl text-teal-700"></strong> / 100</p>
+            <a href="index.html" class="inline-block mt-5 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-5 rounded">Повернутися до курсу</a>
+        </div>
+    </main>
+
+    <script>
+        let score = 0;
+        let stepsCompleted = 0;
+        const totalSteps = 9;
+        const completedTasks = new Set();
+        const compilerEndpoint = 'https://wandbox.org/api/compile.json';
+        const compiler = 'gcc-13.2.0';
+        const editors = [
+            { input: 'while-editor', highlight: 'while-editor-hl' },
+            { input: 'while-olympiad-editor', highlight: 'while-olympiad-editor-hl' },
+            { input: 'for-editor', highlight: 'for-editor-hl' },
+            { input: 'for-olympiad-editor', highlight: 'for-olympiad-editor-hl' },
+            { input: 'control-editor', highlight: 'control-editor-hl' },
+            { input: 'control-olympiad-editor', highlight: 'control-olympiad-editor-hl' }
+        ];
+
+        function highlightCode(text) {
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return escaped.replace(/(#include\b|\/\/.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:while|for|if|else|break|continue|return|using|namespace)\b|\b(?:int|long|short|double|float|char|bool|void|unsigned|auto|const)\b|\b(?:cout|cin|endl)\b|\b\d+\b)/g, (token) => {
+                if (token.startsWith('//')) return `<span class="hl-comment">${token}</span>`;
+                if (token.startsWith('"') || token.startsWith("'")) return `<span class="hl-string">${token}</span>`;
+                if (/^\d/.test(token)) return `<span class="hl-number">${token}</span>`;
+                if (/^(cout|cin|endl)$/.test(token)) return `<span class="hl-function">${token}</span>`;
+                return `<span class="hl-keyword">${token}</span>`;
+            });
+        }
+
+        function setupEditor(inputId, highlightId) {
+            const input = document.getElementById(inputId);
+            const highlight = document.getElementById(highlightId);
+            const update = () => {
+                highlight.innerHTML = `${highlightCode(input.value)}<br>`;
+                highlight.scrollTop = input.scrollTop;
+                highlight.scrollLeft = input.scrollLeft;
+            };
+            input.addEventListener('input', update);
+            input.addEventListener('scroll', update);
+            input.addEventListener('keydown', (event) => {
+                if (event.key !== 'Tab') return;
+                event.preventDefault();
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                input.setRangeText('    ', start, end, 'end');
+                update();
+            });
+            update();
+        }
+        editors.forEach(({ input, highlight }) => setupEditor(input, highlight));
+
+        async function executeCpp(code, input = '') {
+            if (!code.trim()) return { error: 'Спочатку напиши код.' };
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+            try {
+                const response = await fetch(compilerEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        compiler,
+                        code,
+                        stdin: input,
+                        'compiler-option-raw': '-std=c++17',
+                        'runtime-option-raw': ''
+                    }),
+                    signal: controller.signal
+                });
+                const result = await response.json();
+                if (!response.ok) return { error: result.message || `Помилка сервісу компіляції (${response.status}).` };
+                if (result.compiler_error) return { error: result.compiler_error };
+                if (result.program_error || (result.status && result.status !== '0')) {
+                    return { error: result.program_error || result.compiler_output || `Програма завершилася зі статусом ${result.status}.` };
+                }
+                return { output: result.program_output || '' };
+            } catch (error) {
+                if (error.name === 'AbortError') return { error: 'Перевищено час очікування компілятора. Спробуй ще раз.' };
+                return { error: 'Wandbox тимчасово недоступний або обмежив запити. Перевір інтернет-з’єднання та спробуй трохи пізніше.' };
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        function showFeedback(id, success, message) {
+            const element = document.getElementById(id);
+            element.textContent = message;
+            element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'border', 'border-red-300', 'border-green-300');
+            element.classList.add('border', success ? 'bg-green-100' : 'bg-red-100', success ? 'text-green-700' : 'text-red-700', success ? 'border-green-300' : 'border-red-300');
+        }
+
+        function completeTask(taskId, points, nextId) {
+            if (completedTasks.has(taskId)) return;
+            completedTasks.add(taskId);
+            score += points;
+            stepsCompleted += 1;
+            document.getElementById('score-counter').textContent = score;
+            const percent = Math.round((stepsCompleted / totalSteps) * 100);
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', percent);
+            const counter = document.getElementById('score-counter');
+            counter.classList.add('success-anim');
+            setTimeout(() => counter.classList.remove('success-anim'), 500);
+            if (nextId) {
+                const next = document.getElementById(nextId);
+                next.classList.remove('locked');
+                setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 250);
+            }
+            if (stepsCompleted === totalSteps) {
+                document.getElementById('final-score').textContent = score;
+                document.getElementById('completion-message').classList.remove('hidden');
+            }
+        }
+
+        async function runDemo(code, outputId) {
+            const output = document.getElementById(outputId);
+            output.textContent = 'Компіляція та запуск...';
+            const result = await executeCpp(code);
+            output.textContent = result.error ? result.error : (result.output || '(Нічого не виведено)');
+            return !result.error;
+        }
+
+        async function runWhileDemo() {
+            const limit = Number(document.getElementById('while-limit').value);
+            if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
+                document.getElementById('while-output').textContent = 'Введи ціле число від 1 до 20.';
+                return;
+            }
+            const code = `#include <iostream>\nint main() { int limit = ${limit}; int number = 1; while (number <= limit) { std::cout << number << '\\n'; ++number; } return 0; }`;
+            if (await runDemo(code, 'while-output')) completeTask('w1-inter', 5, 'w1-quiz');
+        }
+
+        function checkQuiz(names, feedbackId, taskId, points, nextId, successText) {
+            const answers = names.map((name) => document.querySelector(`input[name="${name}"]:checked`)?.value);
+            if (answers.some((answer) => !answer)) {
+                showFeedback(feedbackId, false, 'Обери відповідь на кожне запитання.');
+                return;
+            }
+            if (answers.every((answer) => answer === 'correct')) {
+                showFeedback(feedbackId, true, successText);
+                completeTask(taskId, points, nextId);
+            } else {
+                showFeedback(feedbackId, false, 'Є помилка. Перечитай пояснення та спробуй ще раз.');
+            }
+        }
+
+        function checkWhileQuiz() {
+            checkQuiz(['wq1', 'wq2'], 'w1-quiz-feedback', 'w1-quiz', 10, 'w1-practice', 'Правильно! Умова перевіряється перед кожним кроком циклу.');
+        }
+
+        async function validateCases(code, cases, feedbackId, successText) {
+            for (const [input, expected] of cases) {
+                const result = await executeCpp(code, input);
+                if (result.error) return showFeedback(feedbackId, false, result.error);
+                if (result.output.trim() !== expected.trim()) return showFeedback(feedbackId, false, `Для цих даних очікується:\n${expected || '(порожній вивід)'}`);
+            }
+            showFeedback(feedbackId, true, successText);
+            return true;
+        }
+
+        async function checkWhilePractice() {
+            const code = document.getElementById('while-editor').value;
+            if (!code.trim()) return showFeedback('w1-practice-feedback', false, 'Спочатку напиши програму.');
+            if (!/\bwhile\s*\(/.test(code)) return showFeedback('w1-practice-feedback', false, 'Для цієї вправи використай цикл while.');
+            const cases = {
+                basic: [['3\n', '1\n2\n3']],
+                medium: [['3\n', '3\n2\n1']],
+                challenge: [['5\n', '6']]
+            };
+            if (await validateCases(code, cases[document.getElementById('while-level').value], 'w1-practice-feedback', 'Чудово! Обраний рівень пройшов контрольний тест.')) {
+                completeTask('w1-practice', 15, 'block-2');
+            }
+        }
+
+        async function checkWhileOlympiad() {
+            const code = document.getElementById('while-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('while-olympiad-feedback', false, 'Спочатку напиши програму.');
+            if (!/\bwhile\s*\(/.test(code)) return showFeedback('while-olympiad-feedback', false, 'Розв’яжи задачу за допомогою циклу while.');
+            await validateCases(code, [['84\n', '7']], 'while-olympiad-feedback', 'Правильно! Контрольний тест пройдено.');
+        }
+
+        async function runForDemo() {
+            const start = Number(document.getElementById('range-start').value);
+            const stop = Number(document.getElementById('range-stop').value);
+            if (![start, stop].every(Number.isInteger) || start < -10 || start > 20 || stop < -10 || stop > 20) {
+                document.getElementById('for-output').textContent = 'Введи цілі числа від -10 до 20.';
+                return;
+            }
+            const code = `#include <iostream>\nint main() { for (int value = ${start}; value < ${stop}; ++value) { std::cout << value << '\\n'; } return 0; }`;
+            if (await runDemo(code, 'for-output')) completeTask('f1-inter', 5, 'f1-quiz');
+        }
+
+        function checkForQuiz() {
+            checkQuiz(['fq1', 'fq2'], 'f1-quiz-feedback', 'f1-quiz', 10, 'f1-practice', 'Саме так: умова i < stop не включає кінцеве значення.');
+        }
+
+        async function checkForPractice() {
+            const code = document.getElementById('for-editor').value;
+            if (!code.trim()) return showFeedback('f1-practice-feedback', false, 'Спочатку напиши програму.');
+            if (!/\bfor\s*\(/.test(code)) return showFeedback('f1-practice-feedback', false, 'Для цієї вправи використай цикл for.');
+            const cases = {
+                basic: [['5\n', '15']],
+                medium: [['10\n', '3\n6\n9']],
+                challenge: [['5\n', '120']]
+            };
+            if (await validateCases(code, cases[document.getElementById('for-level').value], 'f1-practice-feedback', 'Вірно! Обраний рівень пройшов контрольний тест.')) {
+                completeTask('f1-practice', 15, 'block-3');
+            }
+        }
+
+        async function checkForOlympiad() {
+            const code = document.getElementById('for-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('for-olympiad-feedback', false, 'Спочатку напиши програму.');
+            if ((code.match(/\bfor\s*\(/g) || []).length < 2) return showFeedback('for-olympiad-feedback', false, 'Використай вкладені цикли for.');
+            await validateCases(code, [['20\n', '6']], 'for-olympiad-feedback', 'Правильно! Контрольний тест пройдено.');
+        }
+
+        async function runControlDemo() {
+            const code = `#include <iostream>\nint main() { for (int number = 1; number < 8; ++number) { if (number == 3) { continue; } if (number == 6) { break; } std::cout << number << '\\n'; } return 0; }`;
+            if (await runDemo(code, 'control-output')) completeTask('c1-inter', 5, 'c1-quiz');
+        }
+
+        function checkControlQuiz() {
+            checkQuiz(['cq1', 'cq2'], 'c1-quiz-feedback', 'c1-quiz', 10, 'c1-practice', 'Так! break завершує найближчий цикл, а continue пропускає одне повторення.');
+        }
+
+        async function checkControlPractice() {
+            const code = document.getElementById('control-editor').value;
+            if (!code.trim()) return showFeedback('c1-practice-feedback', false, 'Спочатку напиши програму.');
+            const level = document.getElementById('control-level').value;
+            if (level !== 'medium' && !/\bcontinue\s*;/.test(code)) return showFeedback('c1-practice-feedback', false, 'Для цього рівня використай continue.');
+            if (level !== 'basic' && !/\bbreak\s*;/.test(code)) return showFeedback('c1-practice-feedback', false, 'Для цього рівня використай break.');
+            const expected = {
+                basic: '1\n2\n4\n5\n6\n7',
+                medium: '1\n2\n3\n4\n5',
+                challenge: '1\n2\n4\n5\n7'
+            };
+            if (await validateCases(code, [['', expected[level]]], 'c1-practice-feedback', 'Вірно! Обраний рівень пройдено.')) {
+                completeTask('c1-practice', 25, null);
+            }
+        }
+
+        async function checkControlOlympiad() {
+            const code = document.getElementById('control-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('control-olympiad-feedback', false, 'Спочатку напиши програму.');
+            if (!/\bbreak\s*;/.test(code) || !/\bcontinue\s*;/.test(code)) return showFeedback('control-olympiad-feedback', false, 'У розв’язанні мають бути і break, і continue.');
+            const cases = [['-7\n11\n12\n30\n0\n', '12']];
+            await validateCases(code, cases, 'control-olympiad-feedback', 'Правильно! Перевірено пропуск від’ємних і відсутність відповіді.');
+        }
+
+        document.getElementById('loading-overlay').style.display = 'none';
+    </script>
+</body>
+</html>
