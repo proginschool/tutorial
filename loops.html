@@ -124,11 +124,23 @@ while counter &lt;= 3:
                     <button onclick="checkWhilePractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
                     <div id="w1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
                 </div>
+
+                <details class="task-block bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <summary class="cursor-pointer font-bold text-orange-900">Олімпіадна задача: найбільший простий дільник</summary>
+                    <p class="text-sm mt-3 mb-2">Дано ціле число <code>n ≥ 2</code>. Знайди та виведи його найбільший простий дільник. Використай цикл <code>while</code>, щоб послідовно знаходити й прибирати дільники. Обмеження: <code>n ≤ 1 000 000 000</code>.</p>
+                    <p class="text-sm mb-3">Приклади: <code>84 → 7</code>, <code>97 → 97</code>, <code>100 → 5</code>.</p>
+                    <div class="editor-container mb-3" style="height: 220px">
+                        <pre id="while-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="while-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі while" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
+                    </div>
+                    <button onclick="checkWhileOlympiad()" class="bg-orange-700 hover:bg-orange-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
+                    <div id="while-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
             </div>
         </section>
 
         <section id="block-2" class="section-block locked bg-white p-5 sm:p-6 rounded-xl shadow-lg border-t-4 border-teal-600">
-            <h2 class="text-2xl font-bold mb-5 flex items-center gap-3">
+            <h2 class="text-2xl font-bold mb-5 flex flex-wrap items-center gap-3">
                 <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">2</span>
                 Цикл <code>for</code> і функція <code>range()</code>
             </h2>
@@ -193,6 +205,18 @@ while counter &lt;= 3:
                     <button onclick="checkForPractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
                     <div id="f1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
                 </div>
+
+                <details class="task-block bg-teal-50 p-4 rounded-lg border border-teal-200">
+                    <summary class="cursor-pointer font-bold text-teal-900">Олімпіадна задача: піфагорові трійки</summary>
+                    <p class="text-sm mt-3 mb-2">Дано число <code>n</code> (<code>1 ≤ n ≤ 20</code>). Порахуй усі трійки цілих чисел <code>a &lt; b &lt; c ≤ n</code>, для яких <code>a² + b² = c²</code>. Виведи кількість трійок. Перебери можливі значення вкладеними циклами <code>for</code>.</p>
+                    <p class="text-sm mb-3">Приклади: <code>n = 5 → 1</code>, <code>n = 10 → 2</code>, <code>n = 20 → 6</code>.</p>
+                    <div class="editor-container mb-3" style="height: 240px">
+                        <pre id="for-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="for-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі for" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
+                    </div>
+                    <button onclick="checkForOlympiad()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
+                    <div id="for-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
             </div>
         </section>
 
@@ -260,6 +284,18 @@ while counter &lt;= 3:
                     <button onclick="checkControlPractice()" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
                     <div id="c1-practice-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
                 </div>
+
+                <details class="task-block bg-rose-50 p-4 rounded-lg border border-rose-200">
+                    <summary class="cursor-pointer font-bold text-rose-900">Олімпіадна задача: число з простою сумою цифр</summary>
+                    <p class="text-sm mt-3 mb-2">На вході послідовність цілих чисел, по одному на рядок; <code>0</code> завершує ввід. Ігноруй від’ємні числа. Знайди перше додатне число, яке ділиться на суму своїх цифр, причому ця сума є простим числом. Виведи знайдене число або <code>-1</code>, якщо його немає. Використай <code>continue</code> для пропуску значень і <code>break</code> для завершення пошуку. Модуль числа не перевищує <code>1 000 000 000</code>.</p>
+                    <p class="text-sm mb-3">Приклад: <code>-7, 11, 12, 30, 0 → 12</code>.</p>
+                    <div class="editor-container mb-3" style="height: 260px">
+                        <pre id="control-olympiad-editor-hl" class="code-highlight" aria-hidden="true"></pre>
+                        <textarea id="control-olympiad-editor" class="code-input font-mono" aria-label="Код олімпіадної задачі break і continue" spellcheck="false" placeholder="Напиши код Python тут"></textarea>
+                    </div>
+                    <button onclick="checkControlOlympiad()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-2 px-5 rounded">Перевірити код</button>
+                    <div id="control-olympiad-feedback" class="mt-2 text-sm font-semibold hidden p-2 rounded" aria-live="polite"></div>
+                </details>
             </div>
         </section>
 
@@ -278,8 +314,11 @@ while counter &lt;= 3:
         const completedTasks = new Set();
         const editors = [
             { input: 'while-editor', highlight: 'while-editor-hl' },
+            { input: 'while-olympiad-editor', highlight: 'while-olympiad-editor-hl' },
             { input: 'for-editor', highlight: 'for-editor-hl' },
-            { input: 'control-editor', highlight: 'control-editor-hl' }
+            { input: 'for-olympiad-editor', highlight: 'for-olympiad-editor-hl' },
+            { input: 'control-editor', highlight: 'control-editor-hl' },
+            { input: 'control-olympiad-editor', highlight: 'control-olympiad-editor-hl' }
         ];
 
         function highlightCode(text) {
@@ -468,6 +507,18 @@ def run_test_case(code, inputs_json):
             completeTask('w1-practice', 15, 'block-2');
         }
 
+        async function checkWhileOlympiad() {
+            const code = document.getElementById('while-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('while-olympiad-feedback', false, 'Спочатку напиши код.');
+            if (!/\bwhile\b/.test(code)) return showFeedback('while-olympiad-feedback', false, 'Розв’яжи задачу за допомогою циклу while.');
+            for (const [input, expected] of [[84, '7'], [97, '97'], [100, '5'], [2, '2']]) {
+                const result = await executePython(code, [input]);
+                if (result.error) return showFeedback('while-olympiad-feedback', false, result.error);
+                if (result.output.trim() !== expected) return showFeedback('while-olympiad-feedback', false, `Для n = ${input} очікується ${expected}.`);
+            }
+            showFeedback('while-olympiad-feedback', true, 'Правильно! Перевірено на складених і простих числах.');
+        }
+
         async function runForDemo() {
             const start = Number(document.getElementById('range-start').value);
             const stop = Number(document.getElementById('range-stop').value);
@@ -502,6 +553,19 @@ def run_test_case(code, inputs_json):
             completeTask('f1-practice', 15, 'block-3');
         }
 
+        async function checkForOlympiad() {
+            const code = document.getElementById('for-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('for-olympiad-feedback', false, 'Спочатку напиши код.');
+            const loopCount = (code.match(/\bfor\b/g) || []).length;
+            if (loopCount < 2 || !/\brange\s*\(/.test(code)) return showFeedback('for-olympiad-feedback', false, 'Використай вкладені цикли for та range().');
+            for (const [input, expected] of [[20, '6'], [10, '2'], [5, '1'], [4, '0']]) {
+                const result = await executePython(code, [input]);
+                if (result.error) return showFeedback('for-olympiad-feedback', false, result.error);
+                if (result.output.trim() !== expected) return showFeedback('for-olympiad-feedback', false, `Для n = ${input} очікується ${expected} трійок.`);
+            }
+            showFeedback('for-olympiad-feedback', true, 'Правильно! Результат перевірено для чотирьох меж.');
+        }
+
         async function runControlDemo() {
             await runDemo('for number in range(1, 8):\n    if number == 3:\n        continue\n    if number == 6:\n        break\n    print(number)', 'control-output');
             completeTask('c1-inter', 5, 'c1-quiz');
@@ -527,6 +591,23 @@ def run_test_case(code, inputs_json):
             if (result.output.trim() !== expected[level]) return showFeedback('c1-practice-feedback', false, `Для обраного рівня очікується вивід:\n${expected[level]}`);
             showFeedback('c1-practice-feedback', true, 'Вірно! Обраний рівень пройдено.');
             completeTask('c1-practice', 25, null);
+        }
+
+        async function checkControlOlympiad() {
+            const code = document.getElementById('control-olympiad-editor').value;
+            if (!code.trim()) return showFeedback('control-olympiad-feedback', false, 'Спочатку напиши код.');
+            if (!/\bbreak\b/.test(code) || !/\bcontinue\b/.test(code)) return showFeedback('control-olympiad-feedback', false, 'У розв’язанні мають бути і break, і continue.');
+            const cases = [
+                [[-7, 11, 12, 30, 0], '12'],
+                [[13, 17, 27, 0], '-1'],
+                [[0], '-1']
+            ];
+            for (const [inputs, expected] of cases) {
+                const result = await executePython(code, inputs);
+                if (result.error) return showFeedback('control-olympiad-feedback', false, result.error);
+                if (result.output.trim() !== expected) return showFeedback('control-olympiad-feedback', false, `Для послідовності ${inputs.join(', ')} очікується ${expected}.`);
+            }
+            showFeedback('control-olympiad-feedback', true, 'Правильно! Перевірено пропуск від’ємних і відсутність відповіді.');
         }
     </script>
 </body>
